@@ -1,0 +1,11 @@
+1: B They are the same
+2: False it doesn't automatically join
+3: One reason you may use concurrency is when you need to do bulk operations on data or have a large system that
+requires many systems to be working at the same time for the sake of performance
+4: A std::move
+5: True
+6: std::hardware_concurrency
+7: B
+8: False a mutex can be locked and unlocked but lock_guard and unique_lock are RAII
+9: you can also use a shared mutex for when mutliple read access is permitted
+10: A

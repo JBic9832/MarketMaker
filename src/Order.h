@@ -36,6 +36,6 @@ struct Order {
     }
 
 	const double Price;
-	const int Quantity;
+	int Quantity;
 	const Side OrderSide;
 };

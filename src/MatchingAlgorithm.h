@@ -1,9 +1,8 @@
 #pragma once
-#include "Types.h"
+#include "OrderBook.h"
 
 class MatchingAlgorithm {
 public:
     MatchingAlgorithm() {};
-    virtual void Match(bidLevelsContainer bidLevels, askLevelsContainer askLevels) = 0;
-
+    virtual void Match(OrderBook& orderBook, Order& incomingOrder) = 0;
 };

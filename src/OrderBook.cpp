@@ -1,5 +1,6 @@
 #include "OrderBook.h"
 #include "MatchingAlgorithm.h"
+#include <memory>
 #include <numeric>
 
 OrderBook::OrderBook(MatchingAlgorithm& matchingAlgorithm) {
@@ -17,9 +18,9 @@ void OrderBook::AddOrder(Order& order) {
 
     // Insert based on side
     if (order.OrderSide == Side::BID) {
-        m_BidLevels[order.Price].push_back(order);
+        m_BidLevels[order.Price].push_back(std::make_shared<Order>(order));
     } else {
-        m_AskLevels[order.Price].push_back(order);
+        m_AskLevels[order.Price].push_back(std::make_shared<Order>(order));
     }
 }
 
@@ -46,19 +47,19 @@ double OrderBook::GetBestBid() const {
 int OrderBook::BidQuantityAtLevel(double priceLevel) const {
     // Accumulate all of the quantities for orders at a given price level
     return std::accumulate(m_BidLevels.find(priceLevel)->second.begin(), m_BidLevels.find(priceLevel)->second.end(), 0, 
-            [] (int total, const Order& order) { return total + order.Quantity; });
+            [] (int total, const std::shared_ptr<Order>& order) { return total + order->Quantity; });
 
 }
 
 int OrderBook::AskQuantityAtLevel(double priceLevel) const {
     return std::accumulate(m_AskLevels.find(priceLevel)->second.begin(), m_AskLevels.find(priceLevel)->second.end(), 0, 
-            [] (int total, const Order& order) { return total + order.Quantity; });
+            [] (int total, const std::shared_ptr<Order>& order) { return total + order->Quantity; });
 }
 
-std::vector<Order> OrderBook::BidsAtLevel(double priceLevel) const {
+std::vector<std::shared_ptr<Order>> OrderBook::BidsAtLevel(double priceLevel) const {
     return m_BidLevels.find(priceLevel)->second;
 }
 
-std::vector<Order> OrderBook::AsksAtLevel(double priceLevel) const {
+std::vector<std::shared_ptr<Order>> OrderBook::AsksAtLevel(double priceLevel) const {
     return m_AskLevels.find(priceLevel)->second;
 }

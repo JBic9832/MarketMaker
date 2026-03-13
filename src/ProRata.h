@@ -12,74 +12,75 @@ public:
     void Match(OrderBook& orderBook, Order& incomingOrder) override {
         Side side = incomingOrder.OrderSide;
         if (side == Side::BID) {
-            // Exit early if there are no orders in the book
-            if (orderBook.IsEmpty(incomingOrder.OrderSide)) return;
-
-            // Determine if lowest ask price is less than or equal to bid
-            double lowestAsk = orderBook.GetBestAsk();
-
             // Match found for price level
-            if (incomingOrder.Price >= lowestAsk) {
+            if (!orderBook.AsksAtLevel(incomingOrder.Price).empty()) {
                 // if so prorate allocation of quantities at that level
-                const int priceLevelQuantity = orderBook.BidQuantityAtLevel(incomingOrder.Price); 
+                const int priceLevelQuantity = orderBook.AskQuantityAtLevel(incomingOrder.Price); 
+                const int initialIncomingQuantity = incomingOrder.Quantity;
 
                 // For each order in the level, pro rate a percentage of the incoming order quantity
-                for (Order& order : orderBook.BidsAtLevel(incomingOrder.Price)) {
+                for (auto& order : orderBook.AsksAtLevel(incomingOrder.Price)) {
                     // Check if this is the last order
-                    if (&order == &orderBook.BidsAtLevel(incomingOrder.Price).back()) {
+                    if (&order == &orderBook.AsksAtLevel(incomingOrder.Price).back()) {
                         // Remove the remaining quantity since we are at the last order
-                        if (order.Quantity >= incomingOrder.Quantity) {
-                            order.Quantity -= incomingOrder.Quantity;
+                        if (order->Quantity >= incomingOrder.Quantity) {
+                            order->Quantity -= incomingOrder.Quantity;
                             incomingOrder.Quantity = 0;
                             return;
                         } else {
-                            incomingOrder.Quantity -= order.Quantity;
-                            order.Quantity = 0;
+                            incomingOrder.Quantity -= order->Quantity;
+                            order->Quantity = 0;
+                            // Remove the order from the book
                             return;
                         }
                     }
                     
                     // Find the percentage the order is granted
-                    double share = static_cast<double>(order.Quantity) / priceLevelQuantity;
+                    double percent = static_cast<double>(order->Quantity) / priceLevelQuantity;
+                    int share = static_cast<int>(initialIncomingQuantity * percent);
 
                     // Take the share
-                    order.Quantity -= static_cast<int>(incomingOrder.Quantity * share);
-                    incomingOrder.Quantity -= static_cast<int>(incomingOrder.Quantity * share);
+                    order->Quantity -= share;
+                    if (order->Quantity <= 0) {
+                        // Remove it from the book
+                    }
+                    incomingOrder.Quantity -= share;
+
                 }
             }
 
         } else {
-            // No need to do anything
-            if (orderBook.IsEmpty(incomingOrder.OrderSide)) return; 
-
-            // Determine if highest bid is greater than or equal to ask price
-            double highestBid = orderBook.GetBestBid();
-
             // Match found for price level
-            if (incomingOrder.Price <= highestBid) {
+            if (!orderBook.BidsAtLevel(incomingOrder.Price).empty()) {
                 // if so prorate allocation of quantities at that level
-                const int priceLevelQuantity = orderBook.AskQuantityAtLevel(incomingOrder.Price);
+                const int priceLevelQuantity = orderBook.BidQuantityAtLevel(incomingOrder.Price);
+                const int initialIncomingQuantity = incomingOrder.Quantity;
 
-                for (Order& order : orderBook.AsksAtLevel(incomingOrder.Price)) {
-                    if (&order == &orderBook.AsksAtLevel(incomingOrder.Price).back()) {
-                        if (order.Quantity >= incomingOrder.Quantity) {
-                            order.Quantity -= incomingOrder.Quantity;
+                for (auto& order : orderBook.BidsAtLevel(incomingOrder.Price)) {
+                    if (&order == &orderBook.BidsAtLevel(incomingOrder.Price).back()) {
+                        if (order->Quantity >= incomingOrder.Quantity) {
+                            order->Quantity -= incomingOrder.Quantity;
                             incomingOrder.Quantity = 0;
                             return;
                         } else {
-                            incomingOrder.Quantity -= order.Quantity;
-                            order.Quantity = 0;
+                            incomingOrder.Quantity -= order->Quantity;
+                            order->Quantity = 0;
+                            // Remove the order from the book
                             return;
                         }
 
                     }
 
                     // Find the percentage the order is granted
-                    double share = static_cast<double>(order.Quantity) / priceLevelQuantity;
+                    double percent = static_cast<double>(order->Quantity) / priceLevelQuantity;
+                    int share = static_cast<int>(initialIncomingQuantity * percent);
 
                     // Take the share
-                    order.Quantity -= static_cast<int>(incomingOrder.Quantity * share);
-                    incomingOrder.Quantity -= static_cast<int>(incomingOrder.Quantity * share);
+                    order->Quantity -= share;
+                    if (order->Quantity <= 0) {
+                        // Remove it from the book
+                    }
+                    incomingOrder.Quantity -= share;
                 }
             }
         }

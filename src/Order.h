@@ -6,10 +6,16 @@ enum Side {
 	BID
 };
 
-struct Order {
-	Order(double price, int quantity, Side side) : Price{ price }, Quantity{ quantity }, OrderSide{ side } { }
+static int ORDER_COUNTER = 0;
 
-	void Print() {
+struct Order {
+	
+	Order(double price, int quantity, Side side) : Price{ price }, Quantity{ quantity }, OrderSide{ side } { 
+		Id = ORDER_COUNTER;
+		++ORDER_COUNTER;
+	}
+
+	void Print() const {
 		std::string sSide = (OrderSide == Side::ASK) ? "Ask" : "Bid";
 
 		std::cout << sSide << ": " << Price << " x " << Quantity << std::endl;
@@ -38,4 +44,5 @@ struct Order {
 	const double Price;
 	int Quantity;
 	const Side OrderSide;
+	int Id;
 };

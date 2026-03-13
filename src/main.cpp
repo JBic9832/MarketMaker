@@ -1,4 +1,7 @@
 #include <iostream>
+#include <list>
+#include <memory>
+#include "Order.h"
 #include "OrderBook.h"
 #include "ProRata.h"
 
@@ -28,6 +31,10 @@ int main() {
     Order order2{10.5, 100, Side::BID};
     Order order3{10.5,  50, Side::ASK};
 
+    Order order4{10, 100, Side::BID};
+    Order order5{10, 100, Side::ASK};
+    Order order6{10, 100, Side::BID};
+
     order1.Print();
     order2.Print();
     order3.Print();
@@ -36,16 +43,18 @@ int main() {
     ProRata matchingAlgo{};
     OrderBook orderBook{matchingAlgo};
 
-    // Add asks
-    orderBook.AddOrder(order1);
-    orderBook.AddOrder(order3);
+    //// Add asks
+    //orderBook.AddOrder(order1);
+    //orderBook.AddOrder(order3);
 
-    // Add bid
-    orderBook.AddOrder(order2);
+    //// Add bid
+    //orderBook.AddOrder(order2);
+
+    orderBook.AddOrder(order5);
+    orderBook.AddOrder(order4);
+    orderBook.AddOrder(order6);
 
     debugOrderBook("Checking order book after orders", orderBook);
-
-
 
     std::cin.get();
 

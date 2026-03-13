@@ -1,5 +1,6 @@
 #include "OrderBook.h"
 #include "MatchingAlgorithm.h"
+#include "Order.h"
 #include <memory>
 #include <numeric>
 
@@ -56,10 +57,22 @@ int OrderBook::AskQuantityAtLevel(double priceLevel) const {
             [] (int total, const std::shared_ptr<Order>& order) { return total + order->Quantity; });
 }
 
-std::vector<std::shared_ptr<Order>> OrderBook::BidsAtLevel(double priceLevel) const {
-    return m_BidLevels.find(priceLevel)->second;
+std::list<std::shared_ptr<Order>>& OrderBook::BidsAtLevel(double priceLevel) {
+    auto it = m_BidLevels.find(priceLevel);
+    if (it != m_BidLevels.end()) {
+        return it->second;
+    }
+
+    static std::list<std::shared_ptr<Order>> emptyList;
+    return emptyList;
 }
 
-std::vector<std::shared_ptr<Order>> OrderBook::AsksAtLevel(double priceLevel) const {
-    return m_AskLevels.find(priceLevel)->second;
+std::list<std::shared_ptr<Order>>& OrderBook::AsksAtLevel(double priceLevel) {
+    auto it = m_AskLevels.find(priceLevel);
+    if (it != m_AskLevels.end()) {
+        return it->second;
+    }
+
+    static std::list<std::shared_ptr<Order>> emptyList;
+    return emptyList;
 }

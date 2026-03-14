@@ -3,7 +3,6 @@
 #include "MatchingAlgorithm.h"
 #include "Order.h"
 #include "OrderBook.h"
-#include <algorithm>
 #include <memory>
 
 class ProRata : public MatchingAlgorithm {
@@ -23,6 +22,7 @@ public:
 
     }
 
+    // TO debug this I would see what the outcome balance for both orders is at the end and log their ids as well. Turn off all other prints to make this easier
 private:
     void matchBid(OrderBook& orderBook, Order& incomingOrder) {
         auto& asksAtLevel = orderBook.AsksAtLevel(incomingOrder.Price);
@@ -45,6 +45,7 @@ private:
                         incomingOrder.Quantity -= (*it)->Quantity;
                         (*it)->Quantity = 0;
                         // Remove the order from the book
+                        std::cout << "Should have removed order (Last order): " << (*it)->Id << std::endl;
                         it = asksAtLevel.erase(it);
                         return;
                     }
@@ -58,6 +59,7 @@ private:
                 (*it)->Quantity -= share;
                 if ((*it)->Quantity <= 0) {
                     // Remove it from the book
+                    std::cout << "Should have removed order: " << (*it)->Id << std::endl;
                     it = asksAtLevel.erase(it);
                 } else {
                     ++it;
@@ -86,6 +88,7 @@ private:
                         incomingOrder.Quantity -= (*it)->Quantity;
                         (*it)->Quantity = 0;
                         // Remove the order from the book
+                        std::cout << "Should have removed order (Last order): " << (*it)->Id << std::endl;
                         it = bidsAtLevel.erase(it);
                         return;
                     }
@@ -100,6 +103,7 @@ private:
                 (*it)->Quantity -= share;
                 if ((*it)->Quantity <= 0) {
                     // Remove it from the book
+                    std::cout << "Should have removed order: " << (*it)->Id << std::endl;
                     it = bidsAtLevel.erase(it);
                 } else {
                     ++it;

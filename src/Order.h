@@ -18,7 +18,7 @@ struct Order {
 	void Print() const {
 		std::string sSide = (OrderSide == Side::ASK) ? "Ask" : "Bid";
 
-		std::cout << sSide << ": " << Price << " x " << Quantity << std::endl;
+		std::cout << sSide << ": " << Price << " x " << Quantity << " ID: " << Id << std::endl;
 	}
 
 	bool operator>(const Order& other) const {

@@ -8,7 +8,7 @@ OrderBook::OrderBook(MatchingAlgorithm& matchingAlgorithm) {
     m_MatchingAlgorithm = &matchingAlgorithm;
 }
 
-void OrderBook::AddOrder(Order& order) {
+void OrderBook::AddLimitOrder(Order& order) {
     std::string color = (order.OrderSide == Side::BID) ? "\033[32m" : "\033[31m";
     std::cout << color;
     order.Print();
@@ -20,7 +20,7 @@ void OrderBook::AddOrder(Order& order) {
 
     // Make sure we didn't fully fill the order before resting it on the book
     if (order.Quantity <= 0) {
-        std::cout << "Filled\033[0m" << std::endl;
+		std::cout << "\033[0m";
         return;
     }
 
@@ -39,7 +39,7 @@ bool OrderBook::IsEmpty(Side side) const {
 }
 
 // Return the lowest ask price
-double OrderBook::GetBestAsk() const {
+std::int64_t OrderBook::GetBestAsk() const {
     if (!m_AskLevels.empty())
         return m_AskLevels.begin()->first;
 
@@ -47,21 +47,21 @@ double OrderBook::GetBestAsk() const {
 }
 
 // Return the highest bid price
-double OrderBook::GetBestBid() const {
+std::int64_t OrderBook::GetBestBid() const {
     if(!m_BidLevels.empty())
         return m_BidLevels.begin()->first;
 
     return 0;
 }
 
-int OrderBook::BidQuantityAtLevel(double priceLevel) const {
+int OrderBook::BidQuantityAtLevel(std::int64_t priceLevel) const {
     // Accumulate all of the quantities for orders at a given price level
     return std::accumulate(m_BidLevels.find(priceLevel)->second.begin(), m_BidLevels.find(priceLevel)->second.end(), 0, 
             [] (int total, const std::shared_ptr<Order>& order) { return total + order->Quantity; });
 
 }
 
-int OrderBook::AskQuantityAtLevel(double priceLevel) const {
+int OrderBook::AskQuantityAtLevel(std::int64_t priceLevel) const {
     return std::accumulate(m_AskLevels.find(priceLevel)->second.begin(), m_AskLevels.find(priceLevel)->second.end(), 0, 
             [] (int total, const std::shared_ptr<Order>& order) { return total + order->Quantity; });
 }

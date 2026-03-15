@@ -1,6 +1,7 @@
 #pragma once
 #include "Order.h"
 #include "Types.h"
+#include <queue>
 
 class MatchingAlgorithm;
 
@@ -8,12 +9,12 @@ class OrderBook
 {
 public:
 	OrderBook(MatchingAlgorithm& matchingAlgorithm);
-    void AddOrder(Order& order);
+    void AddLimitOrder(Order& order);
 
-    double GetBestBid() const;
-    double GetBestAsk() const;
-    int BidQuantityAtLevel(double priceLevel) const;
-    int AskQuantityAtLevel(double priceLevel) const;
+	std::int64_t GetBestBid() const;
+	std::int64_t GetBestAsk() const;
+    int BidQuantityAtLevel(std::int64_t priceLevel) const;
+    int AskQuantityAtLevel(std::int64_t priceLevel) const;
     std::list<std::shared_ptr<Order>>& BidsAtLevel(double priceLevel);
     std::list<std::shared_ptr<Order>>& AsksAtLevel(double priceLevel);
     bool IsEmpty(Side side) const;
@@ -23,6 +24,8 @@ public:
 private:
     bidLevelsContainer m_BidLevels{};
     askLevelsContainer m_AskLevels{};
+
+	std::queue<std::shared_ptr<Order>> m_LimitOrders{};
 
     MatchingAlgorithm* m_MatchingAlgorithm;
 };

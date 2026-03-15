@@ -25,7 +25,9 @@ private:
     bidLevelsContainer m_BidLevels{};
     askLevelsContainer m_AskLevels{};
 
-	std::queue<std::shared_ptr<Order>> m_LimitOrders{};
+	// Make this a queue for all orders and when a limit order comes in
+	// Send it to the front for immediate processing
+	std::queue<std::shared_ptr<Order>> m_OrderQueue{};
 
     MatchingAlgorithm* m_MatchingAlgorithm;
 };
